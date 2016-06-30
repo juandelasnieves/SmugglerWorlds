@@ -52,6 +52,7 @@ public class GameStage extends Stage implements ContactListener {
     private Rectangle screenRightSide;
     private Rectangle screenLeftSide;
     private Vector3 touchPoint;
+    private int enemies;
     private Boolean create = false;
     Array<Body> deleteList;
 
@@ -76,13 +77,17 @@ public class GameStage extends Stage implements ContactListener {
         super.act(delta);
 
         sweepDeadBodies();
-
+        enemies = 0;
         Array<Body> bodies = new Array<Body>(world.getBodyCount());
         world.getBodies(bodies);
 
         for (Body body : bodies) {
             update(body);
+            if(BodyUtils.bodyIsEnemy(body)) enemies++;
         }
+
+        System.out.println("Numero de enemigos:" + enemies);
+
 
         // Fixed timestep
         accumulator += delta;
@@ -191,6 +196,9 @@ public class GameStage extends Stage implements ContactListener {
             runner.hit();
         } else if ((BodyUtils.bodyIsRunner(a) && BodyUtils.bodyIsGround(b)) ||
                 (BodyUtils.bodyIsGround(a) && BodyUtils.bodyIsRunner(b))) {
+            if(enemies == 0){
+                create = true;
+            }
             runner.landed();
         }else if((BodyUtils.bodyIsDisparo(a) && BodyUtils.bodyIsEnemy(b)) ||
                 BodyUtils.bodyIsDisparo(b) && BodyUtils.bodyIsEnemy(a)){
@@ -254,6 +262,5 @@ public class GameStage extends Stage implements ContactListener {
         Enemy enemy = new Enemy(WorldUtils.createEnemy(world));
         addActor(enemy);
     }
-
 
 }
